@@ -10,11 +10,11 @@
     <h2>WebSocket Chat</h2>
 
     <label for="channelInput">Channel:</label>
-    <input type="text" id="channelInput" placeholder="Enter channel name" />
-    <input type="text" id="userInput" placeholder="Enter user name" />
+    <input type="text" id="channelInput" placeholder="Enter channel name" style="width:130px;" />
+    <input type="text" id="userInput" placeholder="Enter user name" style="width:130px;" />
     <button onclick="joinChannel()">Join</button>
 
-    <div id="chatBox" style="width: 400px; height: 300px; border: 1px solid black; overflow-y: auto; padding: 5px; margin-top: 10px;"></div>
+    <div id="chatBox" style="width: 80%; height: 300px; border: 1px solid black; overflow-y: auto; padding: 5px; margin-top: 10px;"></div>
 
     <input type="text" id="messageInput" placeholder="Type a message..." disabled />
     <button onclick="sendMessage()" disabled>Send</button>
