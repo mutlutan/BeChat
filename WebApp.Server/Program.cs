@@ -14,10 +14,13 @@ using System.Threading.Tasks;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-app.MapGet("/", (IServiceProvider serviceProvider) =>
+app.MapGet("/", (IServiceProvider serviceProvider, HttpContext context) =>
 {
 	var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
 	string dosya = System.IO.File.ReadAllText((webHostEnvironment?.WebRootPath ?? "") + "\\index.html");
+
+	dosya = dosya.Replace("wss://localhost:44334/chat/", "wss://"+ context.Request.Host.ToString() + "/chat/");
+
 	return Results.Content(dosya, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/html"));
 }).ExcludeFromDescription();
 
@@ -83,6 +86,7 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 		}
 	}
 }
+
 
 app.Run();
 

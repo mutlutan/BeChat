@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\WebApp1.csproj": {}
+    "D:\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\WebApp1.csproj": {
+    "D:\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\WebApp1.csproj",
+        "projectUniqueName": "D:\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
         "projectName": "WebApp1",
-        "projectPath": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\WebApp1.csproj",
+        "projectPath": "D:\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
         "packagesPath": "C:\\Users\\user1\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\obj\\",
+        "outputPath": "D:\\Projeler\\BeChat\\WebApp.Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

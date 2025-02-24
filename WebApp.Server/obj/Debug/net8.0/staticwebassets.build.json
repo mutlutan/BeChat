@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "9jeTs0WAMWlvKUlb3APbd8+o39rcYBsguYBvgnMhn/Y=",
+  "Hash": "TzhDI7sepTY3uDPUIP4Z0PspARk42CXq3i76lbHhWSA=",
   "Source": "WebApp1",
   "BasePath": "_content/WebApp1",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "WebApp1\\wwwroot",
       "Source": "WebApp1",
-      "ContentRoot": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\wwwroot\\",
+      "ContentRoot": "D:\\Projeler\\BeChat\\WebApp.Server\\wwwroot\\",
       "BasePath": "_content/WebApp1",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\wwwroot\\index.html",
+      "Identity": "D:\\Projeler\\BeChat\\WebApp.Server\\wwwroot\\index.html",
       "SourceId": "WebApp1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\wwwroot\\",
+      "ContentRoot": "D:\\Projeler\\BeChat\\WebApp.Server\\wwwroot\\",
       "BasePath": "_content/WebApp1",
       "RelativePath": "index#[.{fingerprint}]?.html",
       "AssetKind": "All",
@@ -41,7 +41,7 @@
   "Endpoints": [
     {
       "Route": "index.99ndqq0x41.html",
-      "AssetFile": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\wwwroot\\index.html",
+      "AssetFile": "D:\\Projeler\\BeChat\\WebApp.Server\\wwwroot\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -86,7 +86,7 @@
     },
     {
       "Route": "index.html",
-      "AssetFile": "C:\\Users\\user1\\Desktop\\deneme\\WebApp.Server\\wwwroot\\index.html",
+      "AssetFile": "D:\\Projeler\\BeChat\\WebApp.Server\\wwwroot\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
