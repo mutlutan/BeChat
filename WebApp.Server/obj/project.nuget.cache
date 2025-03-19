@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ic0YAzDu52U=",
+  "dgSpecHash": "KdA3x/suvJU=",
   "success": true,
-  "projectFilePath": "D:\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
+  "projectFilePath": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user1\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.0\\microsoft.aspnetcore.openapi.8.0.0.nupkg.sha512",
     "C:\\Users\\user1\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512"
