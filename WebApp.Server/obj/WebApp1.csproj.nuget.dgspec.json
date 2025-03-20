@@ -1,6 +1,7 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
     "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj": {}
   },
   "projects": {
@@ -12,6 +13,19 @@
         "projectPath": "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
         "packagesPath": "C:\\Users\\user1\\.nuget\\packages\\",
         "outputPath": "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\obj\\",
+=======
+    "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj",
+        "projectName": "WebApp1",
+        "projectPath": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj",
+        "packagesPath": "C:\\Users\\user1\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\obj\\",
+>>>>>>> c2eb53fb878ad06e3510809cfd15780b595e1d9d
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,7 +40,10 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+<<<<<<< HEAD
           "\\\\vmware-host\\Shared Folders\\D\\Genel\\NugetPackage": {},
+=======
+>>>>>>> c2eb53fb878ad06e3510809cfd15780b595e1d9d
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

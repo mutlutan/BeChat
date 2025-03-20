@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
+// sürekli soket bağlantısı kopuyor
+
 app.MapGet("/", (IServiceProvider serviceProvider, HttpContext context) =>
 {
 	var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
