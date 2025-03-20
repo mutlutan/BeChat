@@ -79,19 +79,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
       "projectUniqueName": "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
       "projectName": "WebApp1",
       "projectPath": "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
       "packagesPath": "C:\\Users\\user1\\.nuget\\packages\\",
       "outputPath": "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\obj\\",
-=======
-      "projectUniqueName": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj",
-      "projectName": "WebApp1",
-      "projectPath": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj",
-      "packagesPath": "C:\\Users\\user1\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\obj\\",
->>>>>>> c2eb53fb878ad06e3510809cfd15780b595e1d9d
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -106,10 +98,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-<<<<<<< HEAD
         "\\\\vmware-host\\Shared Folders\\D\\Genel\\NugetPackage": {},
-=======
->>>>>>> c2eb53fb878ad06e3510809cfd15780b595e1d9d
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -161,5 +150,13 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

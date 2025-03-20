@@ -29,7 +29,12 @@ app.MapGet("/", (IServiceProvider serviceProvider, HttpContext context) =>
 // Kanal bazlı bağlı istemcileri saklayan koleksiyon
 var channels = new ConcurrentDictionary<string, ConcurrentDictionary<string, WebSocket>>();
 
-app.UseWebSockets();
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(5) // 5 dakika boyunca bağlantıyı açık tutar
+};
+app.UseWebSockets(webSocketOptions);
+
 app.Map("/chat/{clientId}", async (string clientId, HttpContext context) =>
 {
 	if (context.WebSockets.IsWebSocketRequest)

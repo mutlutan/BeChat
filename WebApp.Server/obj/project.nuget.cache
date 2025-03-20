@@ -1,17 +1,18 @@
 {
   "version": 2,
-<<<<<<< HEAD
   "dgSpecHash": "KeIvDyID3oU=",
   "success": true,
   "projectFilePath": "C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\WebApp1.csproj",
-=======
-  "dgSpecHash": "KdA3x/suvJU=",
-  "success": true,
-  "projectFilePath": "C:\\Users\\user1\\source\\repos\\mutlutan\\BeChat\\WebApp.Server\\WebApp1.csproj",
->>>>>>> c2eb53fb878ad06e3510809cfd15780b595e1d9d
   "expectedPackageFiles": [
     "C:\\Users\\user1\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.0\\microsoft.aspnetcore.openapi.8.0.0.nupkg.sha512",
     "C:\\Users\\user1\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Yedek\\Projeler\\BeChat\\WebApp.Server\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }
