@@ -31,7 +31,7 @@ var channels = new ConcurrentDictionary<string, ConcurrentDictionary<string, Web
 
 var webSocketOptions = new WebSocketOptions
 {
-    KeepAliveInterval = TimeSpan.FromMinutes(5) // 5 dakika boyunca bağlantıyı açık tutar
+    KeepAliveInterval = TimeSpan.FromMinutes(10) // 10 dakika boyunca bağlantıyı açık tutar
 };
 app.UseWebSockets(webSocketOptions);
 
@@ -65,7 +65,8 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 					clients.TryRemove(clientId, out _);
 					
 					// Kullanıcı kanaldan ayrıldığında diğer kullanıcılara bildirim gönder
-					var disconnectMessage = $"{clientId} kanaldan ayrıldı";
+					var timestamp = DateTime.Now.ToString("HH:mm");
+					var disconnectMessage = $"{timestamp} : {clientId} kanaldan ayrıldı";
 					var disconnectMessageBytes = Encoding.UTF8.GetBytes(disconnectMessage);
 					
 					foreach (var client in clients.Values)
@@ -97,24 +98,23 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 						var clients = channels.GetOrAdd(channel, _ => new ConcurrentDictionary<string, WebSocket>());
 						clients.TryAdd(clientId, webSocket);
 						
-						// Kullanıcı kanala katıldığında diğer kullanıcılara bildirim gönder
-						if (clients.Count > 1) // Eğer kanalda başka kullanıcılar varsa
+						// Kullanıcı kanala katıldığında kendisine de bildirim gönder
+						var timestamp = DateTime.Now.ToString("HH:mm");
+						var joinMessage = $"{timestamp} : {clientId} kanala katıldı";
+						var joinMessageBytes = Encoding.UTF8.GetBytes(joinMessage);
+						
+						foreach (var kvp in clients)
 						{
-							var joinMessage = $"{clientId} kanala katıldı";
-							var joinMessageBytes = Encoding.UTF8.GetBytes(joinMessage);
-							
-							foreach (var kvp in clients)
+							if (kvp.Value.State == WebSocketState.Open) // Tüm kullanıcılara, kendisi dahil
 							{
-								if (kvp.Key != clientId && kvp.Value.State == WebSocketState.Open) // Kendisi hariç diğer kullanıcılara
-								{
-									await kvp.Value.SendAsync(new ArraySegment<byte>(joinMessageBytes), WebSocketMessageType.Text, true, CancellationToken.None);
-								}
+								await kvp.Value.SendAsync(new ArraySegment<byte>(joinMessageBytes), WebSocketMessageType.Text, true, CancellationToken.None);
 							}
 						}
 					}
 					else if (messageObj.Type == "message" && channel != null && channels.TryGetValue(channel, out var clients))
 					{
-						var fullMessage = $"{clientId}: {messageObj.Content}";
+						var timestamp = DateTime.Now.ToString("HH:mm");
+						var fullMessage = $"{timestamp} : {clientId} :> {messageObj.Content}";
 						var messageBytes = Encoding.UTF8.GetBytes(fullMessage);
 						foreach (WebSocket client in clients.Values)
 						{
@@ -141,7 +141,8 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 			channelClients.TryRemove(clientId, out _);
 			
 			// Diğer kullanıcılara bildirim gönder
-			var disconnectMessage = $"{clientId} kanaldan ayrıldı";
+			var timestamp = DateTime.Now.ToString("HH:mm");
+			var disconnectMessage = $"{timestamp} : {clientId} kanaldan ayrıldı";
 			var disconnectMessageBytes = Encoding.UTF8.GetBytes(disconnectMessage);
 			
 			foreach (var client in channelClients.Values)
