@@ -7,12 +7,13 @@
     <link rel="icon" href="#" />
 </head>
 <body>
-    <h2>WebSocket Chat Demo App v.0.003</h2>
+    <h2>WebSocket Chat Demo App v.0.004</h2>
 
     <label for="channelInput">Channel:</label>
     <input type="text" id="channelInput" placeholder="Enter channel name" style="width:130px;" />
     <input type="text" id="userInput" placeholder="Enter user name" style="width:130px;" />
     <button onclick="joinChannel()">Join</button>
+    <div id="connectionStatus" style="color: red;"></div>
 
     <div id="chatBox" style="width: 80%; height: 300px; border: 1px solid black; overflow-y: auto; padding: 5px; margin-top: 10px;"></div>
 
@@ -22,6 +23,47 @@
     <script>
         let ws;
         let currentChannel = "";
+        let reconnectAttempts = 0;
+        let maxReconnectAttempts = 5;
+        let reconnectInterval = 3000; // 3 saniye
+        let lastPongTime = Date.now();
+        let connectionCheckInterval;
+        let statusDiv = document.getElementById('connectionStatus');
+
+        function updateConnectionStatus(status, color) {
+            statusDiv.textContent = status;
+            statusDiv.style.color = color;
+        }
+
+        function setupConnectionCheck() {
+            // Her 30 saniyede bir bağlantı durumunu kontrol et
+            connectionCheckInterval = setInterval(() => {
+                const timeSinceLastPong = Date.now() - lastPongTime;
+                if (timeSinceLastPong > 40000) { // 40 saniye
+                    console.log('No pong received, connection might be dead');
+                    updateConnectionStatus('Bağlantı koptu, yeniden bağlanılıyor...', 'red');
+                    reconnect();
+                }
+            }, 30000);
+        }
+
+        function reconnect() {
+            if (reconnectAttempts >= maxReconnectAttempts) {
+                updateConnectionStatus('Maksimum yeniden bağlanma denemesi aşıldı. Sayfayı yenileyin.', 'red');
+                return;
+            }
+
+            if (ws) {
+                ws.close();
+            }
+
+            reconnectAttempts++;
+            updateConnectionStatus(`Yeniden bağlanılıyor... (${reconnectAttempts}/${maxReconnectAttempts})`, 'orange');
+            
+            setTimeout(() => {
+                joinChannel();
+            }, reconnectInterval);
+        }
 
         function joinChannel() {
             const channel = document.getElementById("channelInput").value.trim();
@@ -39,28 +81,48 @@
 
             ws.onopen = () => {
                 console.log(`Connected to WebSocket server on channel: ${channel}`);
+                updateConnectionStatus('Bağlantı kuruldu', 'green');
                 currentChannel = channel;
                 ws.send(JSON.stringify({ Type: "join", Channel: channel, Content: "" }));
                 document.getElementById("messageInput").disabled = false;
                 document.querySelector("button[onclick='sendMessage()']").disabled = false;
+                reconnectAttempts = 0;
+                lastPongTime = Date.now();
+                setupConnectionCheck();
             };
 
             ws.onmessage = (event) => {
                 const message = event.data;
+                if (message === 'ping') {
+                    ws.send('pong');
+                    return;
+                }
+                if (message === 'pong') {
+                    lastPongTime = Date.now();
+                    return;
+                }
                 document.getElementById("chatBox").innerHTML += `<div>${message}</div>`;
                 document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
             };
 
             ws.onclose = () => {
                 console.log("Disconnected from WebSocket server.");
+                clearInterval(connectionCheckInterval);
                 document.getElementById("messageInput").disabled = true;
                 document.querySelector("button[onclick='sendMessage()']").disabled = true;
+                updateConnectionStatus('Bağlantı koptu', 'red');
+                reconnect();
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus('Bağlantı hatası', 'red');
             };
         }
 
         function sendMessage() {
             const message = document.getElementById("messageInput").value;
-            if (message && ws && currentChannel) {
+            if (message && ws && currentChannel && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ Type: "message", Channel: currentChannel, Content: message }));
                 document.getElementById("messageInput").value = "";
             }

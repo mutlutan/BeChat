@@ -31,7 +31,7 @@ var channels = new ConcurrentDictionary<string, ConcurrentDictionary<string, Web
 
 var webSocketOptions = new WebSocketOptions
 {
-    KeepAliveInterval = TimeSpan.FromMinutes(15) // 15 dakika boyunca bağlantıyı açık tutar
+    KeepAliveInterval = TimeSpan.FromMinutes(15) // 15dk düşürüldü
 };
 app.UseWebSockets(webSocketOptions);
 
@@ -53,11 +53,32 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 {
 	string? channel = null;
 	var buffer = new byte[1024 * 4];
+	var pingTimer = new Timer(async _ =>
+	{
+		if (webSocket.State == WebSocketState.Open)
+		{
+			try
+			{
+				// Ping mesajı gönder
+				await webSocket.SendAsync(
+					new ArraySegment<byte>(Encoding.UTF8.GetBytes("ping")),
+					WebSocketMessageType.Text,
+					true,
+					CancellationToken.None);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Ping error for {clientId}: {ex.Message}");
+			}
+		}
+	}, null, TimeSpan.Zero, TimeSpan.FromSeconds(20)); // Her 20 saniyede bir ping
+
 	try
 	{
 		while (webSocket.State == WebSocketState.Open)
 		{
 			var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+			
 			if (result.MessageType == WebSocketMessageType.Close)
 			{
 				if (channel != null && channels.TryGetValue(channel, out var clients))
@@ -89,6 +110,23 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 			else
 			{
 				var messageJson = Encoding.UTF8.GetString(buffer, 0, result.Count);
+				
+				// Ping mesajına yanıt ver
+				if (messageJson == "ping")
+				{
+					await webSocket.SendAsync(
+						new ArraySegment<byte>(Encoding.UTF8.GetBytes("pong")),
+						WebSocketMessageType.Text,
+						true,
+						CancellationToken.None);
+					continue;
+				}
+				else if (messageJson == "pong")
+				{
+					// Pong alındı, bağlantı sağlam
+					continue;
+				}
+
 				var messageObj = JsonSerializer.Deserialize<ChatMessage>(messageJson);
 				if (messageObj != null)
 				{
@@ -134,6 +172,7 @@ async Task HandleWebSocketAsync(string clientId, WebSocket webSocket)
 	}
 	finally
 	{
+		pingTimer.Dispose();
 		// Kullanıcı bağlantısı koptuğunda
 		if (channel != null && channels.TryGetValue(channel, out var channelClients))
 		{
