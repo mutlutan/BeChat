@@ -31,7 +31,7 @@ var channels = new ConcurrentDictionary<string, ConcurrentDictionary<string, Web
 
 var webSocketOptions = new WebSocketOptions
 {
-    KeepAliveInterval = TimeSpan.FromMinutes(10) // 10 dakika boyunca bağlantıyı açık tutar
+    KeepAliveInterval = TimeSpan.FromMinutes(15) // 15 dakika boyunca bağlantıyı açık tutar
 };
 app.UseWebSockets(webSocketOptions);
 
