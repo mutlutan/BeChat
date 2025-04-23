@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Chat Demo</title>
+    <title>SignalR Chat Demo</title>
     <link rel="icon" href="#" />
+    <!-- SignalR Client kütüphanesini ekliyoruz -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.6/signalr.min.js"></script>
 </head>
 <body>
-    <h2>WebSocket Chat Demo App v.0.004</h2>
+    <h2>SignalR Chat Demo App v.1.0</h2>
 
     <label for="channelInput">Channel:</label>
     <input type="text" id="channelInput" placeholder="Enter channel name" style="width:130px;" />
@@ -18,43 +20,112 @@
     <div id="chatBox" style="width: 80%; height: 300px; border: 1px solid black; overflow-y: auto; padding: 5px; margin-top: 10px;"></div>
 
     <input type="text" id="messageInput" placeholder="Type a message..." disabled onkeypress="if(event.key === 'Enter') sendMessage()" />
-    <button onclick="sendMessage()" disabled>Send</button>
+    <button id="sendButton" onclick="sendMessage()" disabled>Send</button>
 
     <script>
-        let ws;
+        let connection;
         let currentChannel = "";
+        let userName = "";
         let reconnectAttempts = 0;
         let maxReconnectAttempts = 5;
         let reconnectInterval = 3000; // 3 saniye
-        let lastPongTime = Date.now();
-        let connectionCheckInterval;
         let statusDiv = document.getElementById('connectionStatus');
-
+        
         function updateConnectionStatus(status, color) {
             statusDiv.textContent = status;
             statusDiv.style.color = color;
         }
 
-        function setupConnectionCheck() {
-            // Her 30 saniyede bir bağlantı durumunu kontrol et
-            connectionCheckInterval = setInterval(() => {
-                const timeSinceLastPong = Date.now() - lastPongTime;
-                if (timeSinceLastPong > 40000) { // 40 saniye
-                    console.log('No pong received, connection might be dead');
-                    updateConnectionStatus('Bağlantı koptu, yeniden bağlanılıyor...', 'red');
+        function joinChannel() {
+            const channel = document.getElementById("channelInput").value.trim();
+            userName = document.getElementById("userInput").value.trim();
+            
+            if (!channel) {
+                alert("Please enter a channel name!");
+                return;
+            }
+            
+            if (!userName) {
+                alert("Please enter a user name!");
+                return;
+            }
+
+            if (connection) {
+                connection.stop();
+            }
+
+            // SignalR bağlantısını başlat
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("___HOST_URL___/chathub", {
+                    // skipNegotiation: true, 
+                    // transport: signalR.HttpTransportType.WebSockets
+                })
+                .withAutomaticReconnect([0, 2000, 5000, 10000, 30000]) // Otomatik yeniden bağlanma
+                .build();
+
+            // Bağlantı başarılı olduğunda
+            connection.start().then(function () {
+                console.log("SignalR Connected.");
+                updateConnectionStatus('Bağlantı kuruldu', 'green');
+                currentChannel = channel;
+                
+                // Kanala katıl
+                connection.invoke("JoinChannel", channel, userName).catch(function (err) {
+                    console.error(err.toString());
+                    updateConnectionStatus('Kanala katılma hatası: ' + err.toString(), 'red');
+                });
+                
+                document.getElementById("messageInput").disabled = false;
+                document.getElementById("sendButton").disabled = false;
+                reconnectAttempts = 0;
+                
+            }).catch(function (err) {
+                console.error("SignalR Connection Error: " + err.toString());
+                updateConnectionStatus('Bağlantı hatası: ' + err.toString(), 'red');
+                reconnect();
+            });
+
+            // Mesaj alma fonksiyonu
+            connection.on("ReceiveMessage", function (message) {
+                document.getElementById("chatBox").innerHTML += `<div>${message}</div>`;
+                document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+            });
+
+            // Bağlantı durumu değişikliklerini izle
+            connection.onreconnecting(error => {
+                updateConnectionStatus('Yeniden bağlanılıyor...', 'orange');
+                console.log("SignalR reconnecting: " + error);
+                document.getElementById("messageInput").disabled = true;
+                document.getElementById("sendButton").disabled = true;
+            });
+
+            connection.onreconnected(connectionId => {
+                updateConnectionStatus('Bağlantı yeniden kuruldu', 'green');
+                console.log("SignalR reconnected with ID: " + connectionId);
+                // Yeniden bağlandığında kanala tekrar katıl
+                connection.invoke("JoinChannel", currentChannel, userName).catch(function (err) {
+                    console.error(err.toString());
+                });
+                document.getElementById("messageInput").disabled = false;
+                document.getElementById("sendButton").disabled = false;
+            });
+
+            connection.onclose(error => {
+                updateConnectionStatus('Bağlantı kapandı', 'red');
+                console.log("SignalR connection closed: " + error);
+                document.getElementById("messageInput").disabled = true;
+                document.getElementById("sendButton").disabled = true;
+                
+                if (reconnectAttempts < maxReconnectAttempts) {
                     reconnect();
                 }
-            }, 30000);
+            });
         }
 
         function reconnect() {
             if (reconnectAttempts >= maxReconnectAttempts) {
                 updateConnectionStatus('Maksimum yeniden bağlanma denemesi aşıldı. Sayfayı yenileyin.', 'red');
                 return;
-            }
-
-            if (ws) {
-                ws.close();
             }
 
             reconnectAttempts++;
@@ -65,65 +136,13 @@
             }, reconnectInterval);
         }
 
-        function joinChannel() {
-            const channel = document.getElementById("channelInput").value.trim();
-            const clientId = document.getElementById("userInput").value.trim();
-            if (!channel) {
-                alert("Please enter a channel name!");
-                return;
-            }
-
-            if (ws) {
-                ws.close();
-            }
-
-            ws = new WebSocket(`wss://localhost:44334/chat/${clientId}`);
-
-            ws.onopen = () => {
-                console.log(`Connected to WebSocket server on channel: ${channel}`);
-                updateConnectionStatus('Bağlantı kuruldu', 'green');
-                currentChannel = channel;
-                ws.send(JSON.stringify({ Type: "join", Channel: channel, Content: "" }));
-                document.getElementById("messageInput").disabled = false;
-                document.querySelector("button[onclick='sendMessage()']").disabled = false;
-                reconnectAttempts = 0;
-                lastPongTime = Date.now();
-                setupConnectionCheck();
-            };
-
-            ws.onmessage = (event) => {
-                const message = event.data;
-                if (message === 'ping') {
-                    ws.send('pong');
-                    return;
-                }
-                if (message === 'pong') {
-                    lastPongTime = Date.now();
-                    return;
-                }
-                document.getElementById("chatBox").innerHTML += `<div>${message}</div>`;
-                document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
-            };
-
-            ws.onclose = () => {
-                console.log("Disconnected from WebSocket server.");
-                clearInterval(connectionCheckInterval);
-                document.getElementById("messageInput").disabled = true;
-                document.querySelector("button[onclick='sendMessage()']").disabled = true;
-                updateConnectionStatus('Bağlantı koptu', 'red');
-                reconnect();
-            };
-
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-                updateConnectionStatus('Bağlantı hatası', 'red');
-            };
-        }
-
         function sendMessage() {
             const message = document.getElementById("messageInput").value;
-            if (message && ws && currentChannel && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ Type: "message", Channel: currentChannel, Content: message }));
+            if (message && connection && connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke("SendMessage", currentChannel, userName, message).catch(function (err) {
+                    console.error(err.toString());
+                    updateConnectionStatus('Mesaj gönderme hatası: ' + err.toString(), 'red');
+                });
                 document.getElementById("messageInput").value = "";
             }
         }
