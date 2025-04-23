@@ -7,6 +7,31 @@
     <link rel="icon" href="#" />
     <!-- SignalR Client kütüphanesini ekliyoruz -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.6/signalr.min.js"></script>
+    <style>
+        .message {
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .self-message {
+            background-color: #dcf8c6;
+            color: #000;
+            text-align: right;
+            margin-left: 20%;
+        }
+        .other-message {
+            background-color: #f1f0f0;
+            color: #000;
+            margin-right: 20%;
+        }
+        .system-message {
+            background-color: #ffc107;
+            color: #333;
+            text-align: center;
+            margin: 5px 10%;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
     <h2>SignalR Chat Demo App v.1.0</h2>
@@ -86,9 +111,23 @@
             });
 
             // Mesaj alma fonksiyonu
-            connection.on("ReceiveMessage", function (message) {
-                document.getElementById("chatBox").innerHTML += `<div>${message}</div>`;
-                document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+            connection.on("ReceiveMessage", function (message, senderId, messageType) {
+                const chatBox = document.getElementById("chatBox");
+                const messageDiv = document.createElement("div");
+                
+                // Mesaj tipine göre CSS sınıfını belirle
+                messageDiv.className = "message";
+                if (messageType === "self") {
+                    messageDiv.className += " self-message";
+                } else if (messageType === "other") {
+                    messageDiv.className += " other-message";
+                } else if (messageType === "system") {
+                    messageDiv.className += " system-message";
+                }
+                
+                messageDiv.textContent = message;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
 
             // Bağlantı durumu değişikliklerini izle

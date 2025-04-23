@@ -17,13 +17,19 @@ namespace WebApp.Server
             await Groups.AddToGroupAsync(Context.ConnectionId, channelName);
             
             var timestamp = DateTime.Now.ToString("HH:mm");
-            await Clients.Group(channelName).SendAsync("ReceiveMessage", $"{timestamp} : {userName} kanala katıldı");
+            await Clients.Group(channelName).SendAsync("ReceiveMessage", $"{timestamp} : {userName} kanala katıldı", "", "system");
         }
 
         public async Task SendMessage(string channelName, string userName, string message)
         {
             var timestamp = DateTime.Now.ToString("HH:mm");
-            await Clients.Group(channelName).SendAsync("ReceiveMessage", $"{timestamp} : {userName} :> {message}");
+            var formattedMessage = $"{timestamp} : {userName} :> {message}";
+            
+            // Mesajı gönderen kullanıcıya, kendi ID'si ile birlikte gönderiyoruz
+            await Clients.Caller.SendAsync("ReceiveMessage", formattedMessage, Context.ConnectionId, "self");
+            
+            // Diğer kullanıcılara, mesajı gönderenin ID'si ile gönderiyoruz
+            await Clients.OthersInGroup(channelName).SendAsync("ReceiveMessage", formattedMessage, Context.ConnectionId, "other");
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -33,7 +39,7 @@ namespace WebApp.Server
                 if (channel.Value.TryRemove(Context.ConnectionId, out var userName))
                 {
                     var timestamp = DateTime.Now.ToString("HH:mm");
-                    await Clients.Group(channel.Key).SendAsync("ReceiveMessage", $"{timestamp} : {userName} kanaldan ayrıldı");
+                    await Clients.Group(channel.Key).SendAsync("ReceiveMessage", $"{timestamp} : {userName} kanaldan ayrıldı", "", "system");
                     
                     if (channel.Value.IsEmpty)
                     {
