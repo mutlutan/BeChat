@@ -79,13 +79,22 @@
                 connection.stop();
             }
 
+            // Hub URL'sini oluştur
+            const hubUrl = "___HOST_URL___/chathub";
+            console.log("Bağlanılacak Hub URL:", hubUrl);
+            
+            updateConnectionStatus('Bağlantı kuruluyor...', 'orange');
+
             // SignalR bağlantısını başlat
             connection = new signalR.HubConnectionBuilder()
-                .withUrl("___HOST_URL___/chathub", {
-                    // skipNegotiation: true, 
-                    // transport: signalR.HttpTransportType.WebSockets
+                .withUrl(hubUrl, {
+                    // HTTPS/HTTP ve WebSocket sorunları için transport otomatik yönetimi
+                    // skipNegotiation: true,
+                    // transport: signalR.HttpTransportType.WebSockets,
+                    logging: signalR.LogLevel.Information
                 })
-                .withAutomaticReconnect([0, 2000, 5000, 10000, 30000]) // Otomatik yeniden bağlanma
+                .withAutomaticReconnect([0, 1000, 5000, 10000, 30000]) // Otomatik yeniden bağlanma aralıkları
+                .configureLogging(signalR.LogLevel.Information) // Loglama seviyesini ayarla
                 .build();
 
             // Bağlantı başarılı olduğunda
@@ -105,8 +114,29 @@
                 reconnectAttempts = 0;
                 
             }).catch(function (err) {
-                console.error("SignalR Connection Error: " + err.toString());
-                updateConnectionStatus('Bağlantı hatası: ' + err.toString(), 'red');
+                console.error("SignalR Connection Error:", err);
+                let errorMessage = "Bağlantı hatası";
+                
+                // Daha ayrıntılı hata mesajı
+                if (err.message) {
+                    errorMessage += ': ' + err.message;
+                }
+                if (err.errorType) {
+                    errorMessage += ' (' + err.errorType + ')';
+                }
+                
+                updateConnectionStatus(errorMessage, 'red');
+                
+                // Tarayıcı konsolunda daha detaylı bilgi
+                console.log("Bağlantı detayları:", {
+                    hubUrl: hubUrl,
+                    navigator: {
+                        onLine: navigator.onLine,
+                        userAgent: navigator.userAgent
+                    },
+                    location: window.location.href
+                });
+                
                 reconnect();
             });
 
@@ -168,19 +198,16 @@
             }
 
             reconnectAttempts++;
-            updateConnectionStatus(`Yeniden bağlanılıyor... (${reconnectAttempts}/${maxReconnectAttempts})`, 'orange');
-            
-            setTimeout(() => {
-                joinChannel();
-            }, reconnectInterval);
+            updateConnectionStatus(`Yeniden bağlanma denemesi: ${reconnectAttempts}`, 'orange');
+            setTimeout(joinChannel, reconnectInterval);
         }
-
+        
         function sendMessage() {
             const message = document.getElementById("messageInput").value;
             if (message && connection && connection.state === signalR.HubConnectionState.Connected) {
                 connection.invoke("SendMessage", currentChannel, userName, message).catch(function (err) {
-                    console.error(err.toString());
-                    updateConnectionStatus('Mesaj gönderme hatası: ' + err.toString(), 'red');
+                    console.error("Mesaj gönderme hatası:", err);
+                    updateConnectionStatus('Mesaj gönderme hatası', 'red');
                 });
                 document.getElementById("messageInput").value = "";
             }
