@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApp.Server
@@ -18,6 +20,9 @@ namespace WebApp.Server
             
             var timestamp = DateTime.Now.ToString("HH:mm");
             await Clients.Group(channelName).SendAsync("ReceiveMessage", $"{timestamp} : {userName} kanala katıldı", "", "system");
+            
+            // Kullanıcı listesini güncelle
+            await SendUserList(channelName);
         }
 
         public async Task SendMessage(string channelName, string userName, string message)
@@ -45,12 +50,28 @@ namespace WebApp.Server
                     {
                         _channels.TryRemove(channel.Key, out _);
                     }
+                    else
+                    {
+                        // Kullanıcı listesini güncelle
+                        await SendUserList(channel.Key);
+                    }
                     
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, channel.Key);
                 }
             }
             
             await base.OnDisconnectedAsync(exception);
+        }
+
+        // Kullanıcı listesini ilgili kanala gönder
+        private Task SendUserList(string channelName)
+        {
+            if (_channels.TryGetValue(channelName, out var users))
+            {
+                var userList = users.Values.Distinct().OrderBy(x => x).ToList();
+                return Clients.Group(channelName).SendAsync("UserList", userList);
+            }
+            return Task.CompletedTask;
         }
     }
 } 
