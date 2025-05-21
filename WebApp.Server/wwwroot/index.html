@@ -136,9 +136,12 @@
                     // transport: signalR.HttpTransportType.WebSockets,
                     logging: signalR.LogLevel.Information
                 })
-                .withAutomaticReconnect([0, 1000, 5000, 10000, 30000]) // Otomatik yeniden bağlanma aralıkları
+                //.withAutomaticReconnect([0, 1000, 5000, 10000, 30000]) // Otomatik yeniden bağlanma aralıkları
+                .withAutomaticReconnect()
                 .configureLogging(signalR.LogLevel.Information) // Loglama seviyesini ayarla
                 .build();
+            connection.serverTimeoutInMilliseconds = 300000; // 5 dakika
+            connection.keepAliveIntervalInMilliseconds = 120000; // 2 dakika
 
             // Kullanıcı listesi alma fonksiyonu
             connection.on("UserList", function(users) {

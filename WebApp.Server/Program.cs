@@ -11,8 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR(options => 
 {
 	// Bağlantı zaman aşımını artır
-	options.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
-	options.KeepAliveInterval = TimeSpan.FromMinutes(1);
+	options.ClientTimeoutInterval = TimeSpan.FromMinutes(5);
+	options.KeepAliveInterval = TimeSpan.FromMinutes(2);
 	
 	// Deploy ortamında daha ayrıntılı günlük kaydı
 	options.EnableDetailedErrors = true;
@@ -29,6 +29,8 @@ builder.Services.AddCors(options =>
 			   .AllowCredentials(); // SignalR için gerekli
 	});
 });
+
+builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
 var app = builder.Build();
 
